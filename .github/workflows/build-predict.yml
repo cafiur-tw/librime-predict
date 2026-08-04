@@ -31,7 +31,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential cmake \
-            libboost-all-dev libgflags-dev libglog-dev \
+            libboost-all-dev libgflags-dev libgoogle-glog-dev \
             libleveldb-dev libmarisa-dev libopencc-dev libyaml-cpp-dev
 
       - name: Configure
