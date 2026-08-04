@@ -1,0 +1,63 @@
+name: Build predict.db
+
+on:
+  push:
+    paths:
+      - 'my-predict-data.tsv'   # 你的 tsv 檔名，改成你實際的檔名
+  workflow_dispatch:            # 也允許手動點按鈕觸發
+
+jobs:
+  build:
+    runs-on: ubuntu-latest      # 借一台雲端 Linux 電腦
+    steps:
+      - name: Checkout this repo (librime-predict + 你的 tsv)
+        uses: actions/checkout@v4
+
+      - name: Checkout librime core
+        uses: actions/checkout@v4
+        with:
+          repository: rime/librime
+          submodules: recursive
+          path: librime
+
+      - name: Put predict plugin into librime/plugins
+        run: |
+          mkdir -p librime/plugins/predict
+          cp -r ./* librime/plugins/predict/ 2>/dev/null || true
+          rm -rf librime/plugins/predict/librime
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake \
+            libboost-all-dev libgflags-dev libglog-dev \
+            libleveldb-dev libmarisa-dev libopencc-dev libyaml-cpp-dev
+
+      - name: Configure
+        working-directory: librime
+        run: |
+          cmake . -Bbuild \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_MERGED_PLUGINS=OFF \
+            -DBUILD_TEST=OFF
+
+      - name: Build
+        working-directory: librime
+        run: cmake --build build --config Release -- -j2
+
+      - name: Locate build_predict tool
+        run: |
+          find librime -iname "*build_predict*" -type f
+
+      - name: Run build_predict on your tsv
+        run: |
+          BUILD_PREDICT=$(find librime -iname "*build_predict*" -type f -executable | head -n1)
+          echo "using tool: $BUILD_PREDICT"
+          "$BUILD_PREDICT" my-predict-data.tsv predict.db
+
+      - name: Upload predict.db
+        uses: actions/upload-artifact@v4
+        with:
+          name: predict-db
+          path: predict.db
