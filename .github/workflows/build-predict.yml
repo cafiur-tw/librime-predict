@@ -29,10 +29,13 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential cmake \
-            libboost-all-dev libgflags-dev libgoogle-glog-dev \
-            libleveldb-dev libmarisa-dev libopencc-dev libyaml-cpp-dev
+          sudo apt-get install -y build-essential cmake
+          sudo apt-get install -y libboost-all-dev
+          sudo apt-get install -y libgflags-dev libgoogle-glog-dev
+          sudo apt-get install -y libleveldb-dev
+          sudo apt-get install -y libmarisa-dev
+          sudo apt-get install -y libopencc-dev
+          sudo apt-get install -y libyaml-cpp-dev
 
       - name: Configure
         working-directory: librime
