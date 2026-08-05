@@ -57,7 +57,7 @@ jobs:
         run: |
           BUILD_PREDICT=$(find librime -iname "*build_predict*" -type f -executable | head -n1)
           echo "using tool: $BUILD_PREDICT"
-          "$BUILD_PREDICT" predict.db my-predict-data.tsv
+          cat my-predict-data.tsv | "$BUILD_PREDICT"
 
       - name: Upload predict.db
         uses: actions/upload-artifact@v4
